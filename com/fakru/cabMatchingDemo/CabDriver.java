@@ -10,7 +10,7 @@ class CabDriver {
     private int totalRating = 0;
 
     CabDriver(String name) {
-        this.name = name;
+        this.name = name; 
         this.ratings = new ArrayList<>();
     }
 
