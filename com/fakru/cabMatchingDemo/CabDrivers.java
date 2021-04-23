@@ -46,25 +46,36 @@ class CabDrivers {
         System.out.println("----------------------");
     }
 
-    public CabDriver findMatchingCabDriver(CabDrivers cabDrivers, CabRiders cabRiders, String cabRiderName) {
-        CabDriver matchingCabDriver = null;
-        CabRider cabRider = cabRiders.getCabRiderByName(cabRiderName);
-        if (cabRider == null) return null;
-        double avgRatingOfCabRider = cabRider.getAvgRating();
+    public CabDriver findMatchingCabDriver(CabRider cabRider) {
+        CabDrivers cabDrivers = CabDrivers.getInstance();
+        boolean isNewCabRider = cabRider == null;
+        double avgRatingOfCabRider = isNewCabRider ? 0d : cabRider.getAvgRating();
         CabDriver maxAvgRatingCabDriver = null;
+        CabDriver matchingCabDriver = null;
         for (CabDriver cabDriver : cabDrivers.getAllCabDrivers()) {
-            if (!cabRider.isDislikedCabDriver(cabDriver)) {
-                if (cabDriver.getAvgRating() >= avgRatingOfCabRider
-                        && (matchingCabDriver == null || cabDriver.getAvgRating() > matchingCabDriver.getAvgRating())) {
-                    matchingCabDriver = cabDriver;
-                }
-                if (maxAvgRatingCabDriver == null) {
-                    maxAvgRatingCabDriver = cabDriver;
-                } else if (cabDriver.getAvgRating() > maxAvgRatingCabDriver.getAvgRating()) {
-                    maxAvgRatingCabDriver = cabDriver;
-                }
+            if (!isNewCabRider) {
+                matchingCabDriver = getMatchingCabDriver(cabRider, cabDriver, matchingCabDriver, avgRatingOfCabRider);
             }
+            maxAvgRatingCabDriver = getMaxAvgRatingCabDriver(cabDriver, maxAvgRatingCabDriver);
         }
-        return matchingCabDriver != null ? matchingCabDriver : maxAvgRatingCabDriver;
+        return isNewCabRider || matchingCabDriver == null ? maxAvgRatingCabDriver : matchingCabDriver;
+
+    }
+
+    private CabDriver getMatchingCabDriver(CabRider cabRider, CabDriver currCabDriver, CabDriver matchingCabDriver, double avgRatingOfCabRider) {
+        if (!cabRider.isDislikedCabDriver(currCabDriver) && currCabDriver.getAvgRating() >= avgRatingOfCabRider
+                && (matchingCabDriver == null || currCabDriver.getAvgRating() > matchingCabDriver.getAvgRating())) {
+            matchingCabDriver = currCabDriver;
+        }
+        return matchingCabDriver;
+    }
+
+    private CabDriver getMaxAvgRatingCabDriver(CabDriver currCabDriver, CabDriver maxAvgRatingCabDriver) {
+        if (maxAvgRatingCabDriver == null) {
+            maxAvgRatingCabDriver = currCabDriver;
+        } else if (currCabDriver.getAvgRating() > maxAvgRatingCabDriver.getAvgRating()) {
+            maxAvgRatingCabDriver = currCabDriver;
+        }
+        return maxAvgRatingCabDriver;
     }
 }
